@@ -8,6 +8,7 @@ public class Main {
 //        } catch (Exception ignored) { }
         window.addTextToWindow("Hello World", Color.BLACK);
         Player p1 = new Player("Aivin", 100, window);
-        window.playerWager(p1);
+        p1.playerWager(window);
+
     }
 }
