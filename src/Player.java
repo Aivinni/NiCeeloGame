@@ -4,19 +4,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Player implements ActionListener  {
+    // Class instance variables
     private String playerName;
     private int chips;
     private int score;
     private int playerWager;
     private OutputWindow window;
+    private Ceelo ceelo;
 
     // turn instance variables
     private Die die1 = new Die();
     private Die die2 = new Die();
     private Die die3 = new Die();
-    private int roll1;
-    private int roll2;
-    private int roll3;
 
     // playerWager instance variables
     private JLabel name;
@@ -30,14 +29,18 @@ public class Player implements ActionListener  {
     private JButton makeWager = new JButton("Make Wager");
     private int wager;
 
-    public Player(String name, int chips, OutputWindow window) {
+    public Player(String name, int chips, OutputWindow window, Ceelo ceelo) {
         this.playerName = name;
         this.chips = chips;
         this.window = window;
+        this.ceelo = ceelo;
     }
 
     public String getName() {
         return playerName;
+    }
+    public void setChips(int newChips) {
+        chips = newChips;
     }
     public int getChips() {
         return chips;
@@ -49,18 +52,10 @@ public class Player implements ActionListener  {
         return playerWager;
     }
 
-    public void turn(Ceelo game) {
-        window.addTextToWindow(this.name + " to wager", Color.black);
-        this.playerWager(window);
-        window.clear();
-        roll1 = die1.rollDie();
-        roll2 = die2.rollDie();
-        roll3 = die3.rollDie();
-        if (roll1 == roll2 && roll2 == roll3) {
-
-        }
+    public void getPlayerWager() {
+        window.addTextToWindow(this.playerName + " to wager", Color.black);
+        playerWager(window);
     }
-
     public void playerWager(OutputWindow window) {
         name = new JLabel(this.playerName + ": Enter your wager");
         entryField = new JTextField(15);
@@ -96,11 +91,39 @@ public class Player implements ActionListener  {
 
         window.frame.setVisible(true);
     }
-
+    public int turn(Ceelo game) {
+        boolean loop = true;
+        while (loop) {
+            int roll1 = die1.rollDie();
+            int roll2 = die2.rollDie();
+            int roll3 = die3.rollDie();
+            loop = false;
+            if (roll1 == roll2 && roll2 == roll3) {
+                game.matchWinner(this);
+                score =  Integer.MAX_VALUE;
+            } else if (roll1 == roll2) {
+                score = roll3;
+            } else if (roll2 == roll3) {
+                score = roll1;
+            } else if (roll1 == roll3) {
+                score = roll2;
+            } else if (roll1 + roll2 + roll3 == 15) {
+                // checks if rolls are 4, 5, 6, only way to get 15 if all numbers are not equal, which is guaranteed because of above code
+                game.matchWinner(this);
+                score = Integer.MAX_VALUE;
+            } else if (roll1 + roll2 + roll3 == 6) {
+                // checks if rolls are 1, 2, 3, only way to get 6 if all numbers are not equal, which is guaranteed because of above code
+                score = -1;
+            } else {
+                loop = true;
+            }
+        }
+        return score;
+    }
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
         JButton srcButton = (JButton) source;
-        if (srcButton.getText().equals("Submit")) {
+        if (srcButton == send) {
             String enteredText = entryField.getText();
             try {
                 wager = Integer.parseInt(enteredText);
@@ -109,18 +132,20 @@ public class Player implements ActionListener  {
                    wager = 0;
                 } else {
                     inputted.setText("Wager: " + enteredText);
+                    makeWager.addActionListener(ceelo);
                     makeWager.addActionListener(this);
                     inputPanel.add(makeWager);
                 }
             } catch (Exception e) {
                 inputted.setText("Enter an integer!");
             }
-        } else if (srcButton.getText().equals("Clear")) {
+        } else if (srcButton == clear) {
             entryField.setText("");
             inputted.setText("");
             inputPanel.remove(makeWager);
-        } else if (srcButton.getText().equals("Make Wager")) {
+        } else if (srcButton == makeWager) {
             playerWager = wager;
+            window.clear();
         }
     }
 }

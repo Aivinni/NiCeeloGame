@@ -8,7 +8,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 
-public class OutputWindow implements ActionListener {
+public class OutputWindow {
     // OutputWindow variables
     public JFrame frame;
     private JTextPane textPane;
@@ -38,9 +38,8 @@ public class OutputWindow implements ActionListener {
         catch (Exception ignored) { }
     }
     public void clear() {
+        frame.getContentPane().removeAll();
         textPane.setText("");
-    }
-    public void actionPerformed(ActionEvent event) {
-
+        frame.add(textPane);
     }
 }
