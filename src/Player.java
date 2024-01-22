@@ -64,19 +64,13 @@ public class Player implements ActionListener  {
         send = new JButton("Submit");
         send.addActionListener(this);
 
-        // Clear button
-        clear = new JButton("Clear");
-        clear.addActionListener(this);
-
         inputted = new JLabel("Your Wager");
 
         // Field to input values
         inputField = new JPanel();
         inputField.add(name);
-        inputField.add(name);
         inputField.add(entryField);
         inputField.add(send);
-        inputField.add(clear);
 
         // Panel to display inputted values
         inputPanel = new JPanel();
@@ -91,15 +85,16 @@ public class Player implements ActionListener  {
 
         window.frame.setVisible(true);
     }
-    public int turn(Ceelo game) {
+    public int[] turn(Ceelo game) {
         boolean loop = true;
+        int[] rolls = new int[3];
         while (loop) {
             int roll1 = die1.rollDie();
             int roll2 = die2.rollDie();
             int roll3 = die3.rollDie();
+            rolls = new int[]{roll1, roll2, roll3};
             loop = false;
             if (roll1 == roll2 && roll2 == roll3) {
-                game.matchWinner(this);
                 score =  Integer.MAX_VALUE;
             } else if (roll1 == roll2) {
                 score = roll3;
@@ -109,16 +104,15 @@ public class Player implements ActionListener  {
                 score = roll2;
             } else if (roll1 + roll2 + roll3 == 15) {
                 // checks if rolls are 4, 5, 6, only way to get 15 if all numbers are not equal, which is guaranteed because of above code
-                game.matchWinner(this);
                 score = Integer.MAX_VALUE;
             } else if (roll1 + roll2 + roll3 == 6) {
                 // checks if rolls are 1, 2, 3, only way to get 6 if all numbers are not equal, which is guaranteed because of above code
-                score = -1;
+                score = 0;
             } else {
                 loop = true;
             }
         }
-        return score;
+        return rolls;
     }
     public void actionPerformed(ActionEvent event) {
         Object source = event.getSource();
@@ -139,10 +133,6 @@ public class Player implements ActionListener  {
             } catch (Exception e) {
                 inputted.setText("Enter an integer!");
             }
-        } else if (srcButton == clear) {
-            entryField.setText("");
-            inputted.setText("");
-            inputPanel.remove(makeWager);
         } else if (srcButton == makeWager) {
             playerWager = wager;
             window.clear();

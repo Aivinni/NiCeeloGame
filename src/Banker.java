@@ -14,6 +14,9 @@ public class Banker {
         this.window = window;
         chips = 1000;
     }
+    public void setChips(int newChips) {
+        chips = newChips;
+    }
     public int getChips() {
         return chips;
     }
@@ -21,12 +24,17 @@ public class Banker {
         return score;
     }
 
-    public int turn(Ceelo game) {
+    public int[] turn(Ceelo game) {
         boolean loop = true;
+        int[] rolls = new int[3];
         while (loop) {
             int roll1 = die1.rollDie();
             int roll2 = die2.rollDie();
             int roll3 = die3.rollDie();
+//            int roll1 = 4;
+//            int roll2 = 5;
+//            int roll3 = 6;
+            rolls = new int[]{roll1, roll2, roll3};
             loop = false;
             if (roll1 == roll2 && roll2 == roll3) {
                 game.bankerMatchVictory();
@@ -43,11 +51,11 @@ public class Banker {
                 score = Integer.MAX_VALUE;
             } else if (roll1 + roll2 + roll3 == 6) {
                 // checks if rolls are 1, 2, 3, which is the only way to get 6 if all numbers are not equal, which is guaranteed because of above code
-                score = -1;
+                score = 0;
             } else {
                 loop = true;
             }
         }
-        return score;
+        return rolls;
     }
 }

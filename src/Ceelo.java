@@ -10,9 +10,7 @@ public class Ceelo implements ActionListener {
     private Player player3;
     private Banker banker;
     private OutputWindow window;
-    private boolean matchOver;
     private boolean bankerMatchVictory;
-    private Player matchWinner;
     private boolean gameOver;
     private boolean bankerVictory;
     private Player winner;
@@ -41,6 +39,8 @@ public class Ceelo implements ActionListener {
     // Wager methods instance variables
     private int playerToWager = 1;
     private boolean makingWagers = false;
+    private JButton rollTheDice = new JButton("Roll The Dice");
+    private boolean diceRoll;
 
     public Ceelo() {
         this.window = new OutputWindow();
@@ -48,11 +48,6 @@ public class Ceelo implements ActionListener {
 
     public void bankerMatchVictory() {
         bankerMatchVictory = true;
-        matchOver = true;
-    }
-    public void matchWinner(Player winner) {
-        matchWinner = winner;
-        matchOver = true;
     }
 
     public void play() {
@@ -126,6 +121,7 @@ public class Ceelo implements ActionListener {
     }
 
     Thread wagerThread = new Thread(this::makeWagers);
+
     Thread matchThread = new Thread(() -> {
         try {
             // Wait for wagerThread to finish
@@ -133,12 +129,278 @@ public class Ceelo implements ActionListener {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        System.out.println("Success");
+        bankerMatchVictory = false;
+        int[] bankerRolls = banker.turn(this);
+        rollTheDice.addActionListener(this);
+        if (!bankerMatchVictory) {
+            window.addTextToWindow("Banker rolls " + bankerRolls[0] + ", " + bankerRolls[1] + ", " + bankerRolls[2] + "\nBanker Score: " + banker.getScore() + "\n", Color.black);
+            if (player1.getChips() > 0) {
+                window.addTextToWindow("Player 1 Turn", Color.black);
+                window.frame.add(rollTheDice, BorderLayout.NORTH);
+                diceRoll = false;
+                while (!diceRoll) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                window.clear();
+                int[] player1Rolls = player1.turn(this);
+                window.addTextToWindow("Roll 1: " + player1Rolls[0] + "\n", Color.black);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                window.addTextToWindow("Roll 2: " + player1Rolls[1] + "\n", Color.black);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                window.addTextToWindow("Roll 3: " + player1Rolls[2] + "\n", Color.black);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                window.addTextToWindow("Player 1 Score: " + player1.getScore() + "\n", Color.black);
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                window.addTextToWindow("Banker Score: " + banker.getScore() + "\n", Color.black);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (player1.getScore() >= banker.getScore()) {
+                    window.addTextToWindow("Player 1 Victory!\n", Color.black);
+                    player1.setChips(player1.getChips() + player1.getWager());
+                    banker.setChips(banker.getChips() - player1.getWager());
+                } else {
+                    window.addTextToWindow("Banker Victory!\n", Color.black);
+                    player1.setChips(player1.getChips() - player1.getWager());
+                    banker.setChips(banker.getChips() + player1.getWager());
+                    if (player1.getChips() <= 0) {
+                        window.addTextToWindow(player1.getName() + " HAS BEEN ELIMINATED\n", Color.black);
+                    }
+                }
+                window.addTextToWindow("Player 1 chips: " + player1.getChips() + "\n", Color.black);
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                window.clear();
+            } else {
+                window.addTextToWindow(player1.getName() + " has already been eliminated", Color.black);
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (player2.getChips() > 0) {
+                window.addTextToWindow("Player 2 Turn", Color.black);
+                window.frame.add(rollTheDice, BorderLayout.NORTH);
+                diceRoll = false;
+                while (!diceRoll) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                window.clear();
+                int[] player2Rolls = player2.turn(this);
+                window.addTextToWindow("Roll 1: " + player2Rolls[0] + "\n", Color.black);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                window.addTextToWindow("Roll 2: " + player2Rolls[1] + "\n", Color.black);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                window.addTextToWindow("Roll 3: " + player2Rolls[2] + "\n", Color.black);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                window.addTextToWindow("Player 2 Score: " + player2.getScore() + "\n", Color.black);
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                window.addTextToWindow("Banker Score: " + banker.getScore() + "\n", Color.black);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (player2.getScore() >= banker.getScore()) {
+                    window.addTextToWindow("Player 2 Victory!\n", Color.black);
+                    player2.setChips(player2.getChips() + player2.getWager());
+                    banker.setChips(banker.getChips() - player2.getWager());
+                } else {
+                    window.addTextToWindow("Banker Victory!\n", Color.black);
+                    player2.setChips(player2.getChips() - player2.getWager());
+                    banker.setChips(banker.getChips() + player2.getWager());
+                    if (player2.getChips() <= 0) {
+                        window.addTextToWindow(player2.getName() + " HAS BEEN ELIMINATED\n", Color.black);
+                    }
+                }
+                window.addTextToWindow("Player 2 chips: " + player2.getChips() + "\n", Color.black);
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                window.clear();
+            } else {
+                window.addTextToWindow(player2.getName() + " has already been eliminated", Color.black);
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (player3.getChips() > 0) {
+                window.addTextToWindow("Player 3 Turn", Color.black);
+                window.frame.add(rollTheDice, BorderLayout.NORTH);
+                diceRoll = false;
+                while (!diceRoll) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                window.clear();
+                int[] player3Rolls = player3.turn(this);
+                window.addTextToWindow("Roll 1: " + player3Rolls[0] + "\n", Color.black);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                window.addTextToWindow("Roll 2: " + player3Rolls[1] + "\n", Color.black);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                window.addTextToWindow("Roll 3: " + player3Rolls[2] + "\n", Color.black);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                window.addTextToWindow("Player 3 Score: " + player3.getScore() + "\n", Color.black);
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                window.addTextToWindow("Banker Score: " + banker.getScore() + "\n", Color.black);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (player3.getScore() >= banker.getScore()) {
+                    window.addTextToWindow("Player 3 Victory!\n", Color.black);
+                    player3.setChips(player3.getChips() + player3.getWager());
+                    banker.setChips(banker.getChips() - player3.getWager());
+                } else {
+                    window.addTextToWindow("Banker Victory!\n", Color.black);
+                    player3.setChips(player3.getChips() - player3.getWager());
+                    banker.setChips(banker.getChips() + player3.getWager());
+                    if (player1.getChips() <= 0) {
+                        window.addTextToWindow(player3.getName() + " HAS BEEN ELIMINATED\n", Color.black);
+                    }
+                }
+                window.addTextToWindow("Player 3 chips: " + player3.getChips() + "\n", Color.black);
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                window.clear();
+            } else {
+                window.addTextToWindow(player3.getName() + " has already been eliminated", Color.black);
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            window.addTextToWindow("Banker Victory \n", Color.black);
+            window.addTextToWindow("Banker Rolls: " + bankerRolls[0] + ", " + bankerRolls[1] + ", " + bankerRolls[2] + "\n", Color.black);
+            banker.setChips(banker.getChips() + player1.getWager() + player2.getWager() + player3.getWager());
+            player1.setChips(player1.getChips() - player1.getWager());
+            player2.setChips(player2.getChips() - player2.getWager());
+            player3.setChips(player3.getChips() - player3.getWager());
+            window.addTextToWindow("Banker chips: " + banker.getChips() + "\n", Color.black);
+            if (player1.getChips() > 0) {
+                window.addTextToWindow("Player 1 chips: " + player1.getChips() + "\n", Color.black);
+            }
+            if (player2.getChips() > 0) {
+                window.addTextToWindow("Player 2 chips: " + player2.getChips() + "\n", Color.black);
+            }
+            if (player3.getChips() > 0) {
+                window.addTextToWindow("Player 3 chips: " + player3.getChips() + "\n", Color.black);
+            }
+        }
+        if (player1.getChips() <= 0 && player2.getChips() <= 0 && player3.getChips() <= 0) {
+            gameOver = true;
+            bankerVictory = true;
+        }
+        if (banker.getChips() <= 0) {
+            gameOver = true;
+            if (player1.getChips() > player2.getChips() && player1.getChips() > player3.getChips()) {
+                winner = player1;
+            } else if (player2.getChips() > player1.getChips() && player2.getChips() > player3.getChips()) {
+                winner = player2;
+            } else if (player3.getChips() > player1.getChips() && player3.getChips() > player2.getChips()) {
+                winner = player3;
+            } else {
+                winner = null;
+            }
+        }
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        window.clear();
     });
 
     public void playMatch() {
-        matchThread.start();
-        wagerThread.start();
+        gameOver = false;
+        while (!gameOver) {
+            matchThread.start();
+            wagerThread.start();
+        }
+        if (bankerVictory) {
+            window.addTextToWindow("BANKER VICTORY!", Color.black);
+        } else {
+            if (winner != null) {
+                window.addTextToWindow(winner.getName() + "WINS!!!!", Color.black);
+            } else {
+                window.addTextToWindow("Game is a tie!", Color.black);
+            }
+        }
     }
 
     Thread wait = new Thread(() -> {
@@ -228,6 +490,7 @@ public class Ceelo implements ActionListener {
                 finalRow.add(confirmDone);
             }
         } else if (srcButton.getText().equals("Confirm all?")) {
+            banker = new Banker(window);
             window.clear();
             playMatch();
         } else if (srcButton.getText().equals("Make Wager")) {
@@ -246,6 +509,8 @@ public class Ceelo implements ActionListener {
                 playerToWager = 1;
                 makingWagers = false;
             }
+        } else if (srcButton == rollTheDice) {
+            diceRoll = true;
         }
     }
 }
