@@ -41,6 +41,7 @@ public class Ceelo implements ActionListener {
     private boolean makingWagers = false;
     private JButton rollTheDice = new JButton("Roll The Dice");
     private boolean diceRoll;
+    private JButton newMatch = new JButton("Start New Match?");
 
     public Ceelo() {
         this.window = new OutputWindow();
@@ -120,8 +121,37 @@ public class Ceelo implements ActionListener {
         window.frame.setVisible(true);
     }
 
-    Thread wagerThread = new Thread(this::makeWagers);
+    Thread wait = new Thread(() -> {
+        while (makingWagers) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    });
+    Thread getWager = new Thread(() -> {
+        player1.getPlayerWager();
+    });
+    Thread wagerThread = new Thread(() -> {
+        makingWagers = true;
+        window.addTextToWindow("Player 1 chips: " + player1.getChips() + "\n", Color.black);
+        window.addTextToWindow("Player 2 chips: " + player2.getChips() + "\n", Color.black);
+        window.addTextToWindow("Player 3 chips: " + player3.getChips() + "\n", Color.black);
+        window.addTextToWindow("Player 1 wager: " + player1.getWager() + "\n", Color.black);
+        window.addTextToWindow("Player 2 wager: " + player2.getWager() + "\n", Color.black);
+        window.addTextToWindow("Player 3 wager: " + player3.getWager() + "\n", Color.black);
 
+        wait.start();
+        getWager.start();
+        try {
+            // Wait for both getWager and wait threads to finish
+            getWager.join();
+            wait.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    });
     Thread matchThread = new Thread(() -> {
         try {
             // Wait for wagerThread to finish
@@ -378,58 +408,26 @@ public class Ceelo implements ActionListener {
                 winner = null;
             }
         }
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         window.clear();
+        if (gameOver) {
+            if (bankerVictory) {
+                window.addTextToWindow("BANKER WINS!", Color.black);
+            } else {
+                if (winner != null) {
+                    window.addTextToWindow(winner.getName() + "WINS!!!!", Color.black);
+                } else {
+                    window.addTextToWindow("Game is a tie!", Color.black);
+                }
+            }
+        } else {
+            newMatch.addActionListener(this);
+            window.frame.add(newMatch, BorderLayout.NORTH);
+        }
     });
-
     public void playMatch() {
         gameOver = false;
-        while (!gameOver) {
-            matchThread.start();
-            wagerThread.start();
-        }
-        if (bankerVictory) {
-            window.addTextToWindow("BANKER VICTORY!", Color.black);
-        } else {
-            if (winner != null) {
-                window.addTextToWindow(winner.getName() + "WINS!!!!", Color.black);
-            } else {
-                window.addTextToWindow("Game is a tie!", Color.black);
-            }
-        }
-    }
-
-    Thread wait = new Thread(() -> {
-        while (makingWagers) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    });
-    Thread getWager = new Thread(() -> {
-        player1.getPlayerWager();
-    });
-    public void makeWagers() {
-        makingWagers = true;
-        window.addTextToWindow("Player 1 wager: " + player1.getWager() + "\n", Color.black);
-        window.addTextToWindow("Player 2 wager: " + player2.getWager() + "\n", Color.black);
-        window.addTextToWindow("Player 3 wager: " + player3.getWager() + "\n", Color.black);
-
-        getWager.start();
-        wait.start();
-        try {
-            // Wait for both getWager and wait threads to finish
-            getWager.join();
-            wait.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        wagerThread.start();
+        matchThread.start();
     }
 
     public void actionPerformed(ActionEvent event) {
@@ -496,11 +494,17 @@ public class Ceelo implements ActionListener {
         } else if (srcButton.getText().equals("Make Wager")) {
             playerToWager++;
             if (playerToWager == 2) {
+                window.addTextToWindow("Player 1 chips: " + player1.getChips() + "\n", Color.black);
+                window.addTextToWindow("Player 2 chips: " + player2.getChips() + "\n", Color.black);
+                window.addTextToWindow("Player 3 chips: " + player3.getChips() + "\n", Color.black);
                 window.addTextToWindow("Player 1 wager: " + player1.getWager() + "\n", Color.black);
                 window.addTextToWindow("Player 2 wager: " + player2.getWager() + "\n", Color.black);
                 window.addTextToWindow("Player 3 wager: " + player3.getWager() + "\n", Color.black);
                 player2.getPlayerWager();
             } else if (playerToWager == 3) {
+                window.addTextToWindow("Player 1 chips: " + player1.getChips() + "\n", Color.black);
+                window.addTextToWindow("Player 2 chips: " + player2.getChips() + "\n", Color.black);
+                window.addTextToWindow("Player 3 chips: " + player3.getChips() + "\n", Color.black);
                 window.addTextToWindow("Player 1 wager: " + player1.getWager() + "\n", Color.black);
                 window.addTextToWindow("Player 2 wager: " + player2.getWager() + "\n", Color.black);
                 window.addTextToWindow("Player 3 wager: " + player3.getWager() + "\n", Color.black);
@@ -511,6 +515,9 @@ public class Ceelo implements ActionListener {
             }
         } else if (srcButton == rollTheDice) {
             diceRoll = true;
+        } else if (srcButton == newMatch) {
+            System.out.println("test");
+            playMatch();
         }
     }
 }

@@ -95,7 +95,7 @@ public class Player implements ActionListener  {
             rolls = new int[]{roll1, roll2, roll3};
             loop = false;
             if (roll1 == roll2 && roll2 == roll3) {
-                score =  Integer.MAX_VALUE;
+                score =  7;
             } else if (roll1 == roll2) {
                 score = roll3;
             } else if (roll2 == roll3) {
@@ -104,7 +104,7 @@ public class Player implements ActionListener  {
                 score = roll2;
             } else if (roll1 + roll2 + roll3 == 15) {
                 // checks if rolls are 4, 5, 6, only way to get 15 if all numbers are not equal, which is guaranteed because of above code
-                score = Integer.MAX_VALUE;
+                score = 7;
             } else if (roll1 + roll2 + roll3 == 6) {
                 // checks if rolls are 1, 2, 3, only way to get 6 if all numbers are not equal, which is guaranteed because of above code
                 score = 0;
